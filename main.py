@@ -9,10 +9,6 @@ class Item(BaseModel):
 
 items = []
 
-@app.get("/ola")
-def root():
-    return{"Hello":"World"}
-
 @app.post("/items")
 def create_item(item:Item):
     items.append(item)
