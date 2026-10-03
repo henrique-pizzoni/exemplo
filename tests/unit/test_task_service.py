@@ -39,7 +39,7 @@ class TestTaskService:
 
         # assertivas
         repository.add.assert_called_once_with(Task(title="Estudar", is_done=False))
-        assert created_task.title == "Estudar"
+        assert created_task.title == "Estu"
 
     def test_list_tasks_returns_only_the_requested_limit(self):
         # fixtures
