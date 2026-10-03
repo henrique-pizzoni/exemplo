@@ -1,0 +1,61 @@
+jenkins:
+  systemMessage: "Jenkins do exemplo C14 - configurado pelo jenkins/casc.yaml"
+
+  securityRealm:
+    local:
+      allowsSignup: false
+      users:
+        - id: "${JENKINS_ADMIN_ID}"
+          password: "${JENKINS_ADMIN_PASSWORD}"
+  authorizationStrategy:
+    loggedInUsersCanDoAnything:
+      allowAnonymousRead: false
+
+
+credentials:
+  system:
+    domainCredentials:
+      - credentials:
+          - usernamePassword:
+              scope: GLOBAL
+              id: "github"
+              description: "Token do GitHub para baixar o repositorio"
+              username: "${GITHUB_USER}"
+              password: "${GITHUB_TOKEN}"
+          - string:
+              scope: GLOBAL
+              id: "render-deploy-hook"
+              description: "URL secreta que dispara o deploy no Render"
+              secret: "${RENDER_DEPLOY_HOOK}"
+
+
+jobs:
+  - script: >
+      multibranchPipelineJob('exemplo') {
+        displayName('exemplo')
+        description('Pipeline Build -> Test -> Deploy')
+        branchSources {
+          branchSource {
+            source {
+              git {
+                id('exemplo')
+                remote('${GITHUB_REPO_URL}')
+                credentialsId('github')
+                traits {
+                  gitBranchDiscovery()
+                }
+              }
+            }
+          }
+        }
+        triggers {
+          periodicFolderTrigger {
+            interval('1m')
+          }
+        }
+        orphanedItemStrategy {
+          discardOldItems {
+            numToKeep(5)
+          }
+        }
+      }
